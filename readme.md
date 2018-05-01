@@ -7,5 +7,5 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
 </p>
 
-1 - Para rodar o projeto basta entrar no diretório do projeto e rodar o comando no terminal: php artisan serve
-2 - Crie o banco de dados mysql com o script que está na pasta do projeto.
+<p>1 - Para rodar o projeto basta entrar no diretório do projeto e rodar o comando no terminal: php artisan serve</p><br>
+<p>2 - Crie o banco de dados mysql com o script que está na pasta do projeto.</p>

@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 28 Apr 2018 21:57:22 +0000.
+ * Date: Tue, 01 May 2018 00:55:11 +0000.
  */
 
 namespace App\Models;
@@ -17,6 +17,8 @@ use Reliese\Database\Eloquent\Model as Eloquent;
  * @property string $tipo
  * @property int $numero
  * @property string $email
+ * 
+ * @property \App\Models\TbFornecedore $tb_fornecedore
  *
  * @package App\Models
  */
@@ -36,4 +38,9 @@ class TbContatosFornecedore extends Eloquent
 		'numero',
 		'email'
 	];
+
+	public function tb_fornecedore()
+	{
+		return $this->belongsTo(\App\Models\TbFornecedore::class, 'id_fornecedor');
+	}
 }

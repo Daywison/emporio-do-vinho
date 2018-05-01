@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 28 Apr 2018 21:57:22 +0000.
+ * Date: Tue, 01 May 2018 00:55:11 +0000.
  */
 
 namespace App\Models;
@@ -14,7 +14,10 @@ use Reliese\Database\Eloquent\Model as Eloquent;
  * 
  * @property int $id_marca
  * @property string $marca
- * @property bool $status
+ * @property int $status
+ * @property \Carbon\Carbon $dt_cadastro
+ * 
+ * @property \Illuminate\Database\Eloquent\Collection $tb_produtos
  *
  * @package App\Models
  */
@@ -24,11 +27,21 @@ class TbMarca extends Eloquent
 	public $timestamps = false;
 
 	protected $casts = [
-		'status' => 'bool'
+		'status' => 'int'
+	];
+
+	protected $dates = [
+		'dt_cadastro'
 	];
 
 	protected $fillable = [
 		'marca',
-		'status'
+		'status',
+		'dt_cadastro'
 	];
+
+	public function tb_produtos()
+	{
+		return $this->hasMany(\App\Models\TbProduto::class, 'id_marca');
+	}
 }

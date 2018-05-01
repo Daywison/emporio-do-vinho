@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `estoque_adega`.`migrations` (
   `batch` INT(11) NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 53
+AUTO_INCREMENT = 57
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
@@ -36,11 +36,12 @@ COLLATE = utf8mb4_unicode_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_categorias` (
   `id_categoria` INT(11) NOT NULL AUTO_INCREMENT,
-  `categoria` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `categoria` VARCHAR(30) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   `status` TINYINT(1) NOT NULL,
-  PRIMARY KEY (`id_categoria`))
+  `dt_cadastro` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_categoria`),
+  INDEX `idx_id_categoria` (`id_categoria` ASC, `status` ASC))
 ENGINE = InnoDB
-AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
@@ -54,7 +55,9 @@ CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_clientes` (
   `tipo_cliente` ENUM('Pessoa Fisica', 'Pessoa Juridica') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
   `cpf` BIGINT(20) NULL DEFAULT NULL,
   `cnpj` BIGINT(20) NULL DEFAULT NULL,
-  PRIMARY KEY (`id_cliente`))
+  PRIMARY KEY (`id_cliente`),
+  UNIQUE INDEX `idx_cpf` (`cpf` ASC),
+  UNIQUE INDEX `idx_cnpj` (`cnpj` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
@@ -66,11 +69,38 @@ COLLATE = utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_contatos_clientes` (
   `id_contato` INT(11) NOT NULL AUTO_INCREMENT,
   `id_cliente` INT(11) NOT NULL,
-  `tipo` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `numero` INT(11) NOT NULL,
+  `tipo` ENUM('Recado', 'Secundário', 'Principal') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   `email` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `nr_celular` INT(11) NULL DEFAULT NULL,
+  `nr_telefone_comercial` INT(11) NULL DEFAULT NULL,
+  `Ramal` INT(11) NULL DEFAULT NULL,
+  `nr_telefone_residencial` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id_contato`),
-  INDEX `fk_cliente_idx` (`id_cliente` ASC))
+  INDEX `fk_cliente_idx` (`id_cliente` ASC),
+  INDEX `idx_email` (`email` ASC),
+  CONSTRAINT `fk_cliente`
+    FOREIGN KEY (`id_cliente`)
+    REFERENCES `estoque_adega`.`tb_clientes` (`id_cliente`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------
+-- Table `estoque_adega`.`tb_fornecedores`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_fornecedores` (
+  `id_fornecedor` INT(11) NOT NULL AUTO_INCREMENT,
+  `razao_social` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `nome_fantasia` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
+  `cnpj` BIGINT(20) NOT NULL,
+  `inscricao_estadual` VARCHAR(14) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `inscricao_municipal` VARCHAR(14) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
+  `ramo_atividade` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
+  PRIMARY KEY (`id_fornecedor`),
+  UNIQUE INDEX `idx_cnpj` (`cnpj` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
@@ -86,7 +116,13 @@ CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_contatos_fornecedores` (
   `numero` INT(11) NOT NULL,
   `email` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   PRIMARY KEY (`id_contato`),
-  INDEX `fk_fornecedor_idx` (`id_fornecedor` ASC))
+  INDEX `fk_fornecedor_idx` (`id_fornecedor` ASC),
+  INDEX `idx_email` (`email` ASC),
+  CONSTRAINT `fk_fornecedor`
+    FOREIGN KEY (`id_fornecedor`)
+    REFERENCES `estoque_adega`.`tb_fornecedores` (`id_fornecedor`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
@@ -97,16 +133,23 @@ COLLATE = utf8mb4_unicode_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_endereco_cliente` (
   `id_endereco` INT(11) NOT NULL AUTO_INCREMENT,
-  `rua` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `estado` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `cidade` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `bairro` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `numero` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `cep` VARCHAR(7) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `logradouro` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
   `id_cliente` INT(11) NOT NULL,
+  `rua` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `numero` INT(11) NOT NULL,
+  `complemento` VARCHAR(20) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
+  `cep` VARCHAR(9) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `bairro` VARCHAR(30) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `cidade` VARCHAR(30) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `estado` VARCHAR(30) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `pais` VARCHAR(20) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   PRIMARY KEY (`id_endereco`),
-  INDEX `fk_end_cliente_idx` (`id_cliente` ASC))
+  INDEX `fk_end_cliente_idx` (`id_cliente` ASC),
+  INDEX `idx_cep` (`cep` ASC),
+  CONSTRAINT `fk_end_cliente`
+    FOREIGN KEY (`id_cliente`)
+    REFERENCES `estoque_adega`.`tb_clientes` (`id_cliente`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
@@ -117,16 +160,80 @@ COLLATE = utf8mb4_unicode_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_endereco_fornecedor` (
   `id_endereco` INT(11) NOT NULL AUTO_INCREMENT,
-  `rua` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `estado` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `cidade` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `bairro` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `numero` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `cep` VARCHAR(7) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `logradouro` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
   `id_fornecedor` INT(11) NOT NULL,
+  `rua` VARCHAR(50) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `numero` INT(11) NOT NULL,
+  `complemento` VARCHAR(30) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
+  `cep` VARCHAR(7) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `bairro` VARCHAR(30) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `cidade` VARCHAR(30) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `estado` VARCHAR(20) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `pais` VARCHAR(20) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   PRIMARY KEY (`id_endereco`),
-  INDEX `fk_end_fornecedor_idx` (`id_fornecedor` ASC))
+  INDEX `fk_end_fornecedor_idx` (`id_fornecedor` ASC),
+  INDEX `idx_cep` (`cep` ASC),
+  CONSTRAINT `fk_end_fornecedor`
+    FOREIGN KEY (`id_fornecedor`)
+    REFERENCES `estoque_adega`.`tb_fornecedores` (`id_fornecedor`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------
+-- Table `estoque_adega`.`tb_marcas`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_marcas` (
+  `id_marca` INT(11) NOT NULL AUTO_INCREMENT,
+  `marca` VARCHAR(30) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `status` TINYINT(1) NOT NULL,
+  `dt_cadastro` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_marca`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------
+-- Table `estoque_adega`.`tb_produtos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_produtos` (
+  `id_produto` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_fornecedor` INT(11) NOT NULL,
+  `id_marca` INT(11) NOT NULL,
+  `id_categoria` INT(11) NOT NULL,
+  `descricao` VARCHAR(50) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `cod_barras` INT(11) NULL DEFAULT NULL,
+  `valor_custo` DECIMAL(9,2) NOT NULL,
+  `valor_venda` DECIMAL(9,2) NOT NULL,
+  `icms` INT(11) NULL DEFAULT NULL,
+  `ipi` INT(11) NULL DEFAULT NULL,
+  `pis` INT(11) NULL DEFAULT NULL,
+  `cofins` INT(11) NULL DEFAULT NULL,
+  `iva` INT(11) NULL DEFAULT NULL,
+  `margem_lucro` DECIMAL(5,2) NULL DEFAULT NULL,
+  `data_cadastro` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_produto`),
+  INDEX `fk_fornecedores_idx` (`id_fornecedor` ASC),
+  INDEX `fk_marca_idx` (`id_marca` ASC),
+  INDEX `fk_categoria_idx` (`id_categoria` ASC),
+  CONSTRAINT `fk_categoria`
+    FOREIGN KEY (`id_categoria`)
+    REFERENCES `estoque_adega`.`tb_categorias` (`id_categoria`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_fornecedores`
+    FOREIGN KEY (`id_fornecedor`)
+    REFERENCES `estoque_adega`.`tb_fornecedores` (`id_fornecedor`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_marca`
+    FOREIGN KEY (`id_marca`)
+    REFERENCES `estoque_adega`.`tb_marcas` (`id_marca`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
@@ -139,37 +246,51 @@ CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_estoque` (
   `id_produto` INT(11) NOT NULL,
   `quantidade` INT(11) NOT NULL DEFAULT '0',
   `estoque_em_transito` INT(11) NULL DEFAULT NULL,
-  PRIMARY KEY (`id_produto`))
+  PRIMARY KEY (`id_produto`),
+  CONSTRAINT `fk_produto`
+    FOREIGN KEY (`id_produto`)
+    REFERENCES `estoque_adega`.`tb_produtos` (`id_produto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------
--- Table `estoque_adega`.`tb_fornecedores`
+-- Table `estoque_adega`.`tb_vendas`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_fornecedores` (
-  `id_fornecedor` INT(11) NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `cnpj` BIGINT(20) NOT NULL,
-  `inscricao_estadual` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  PRIMARY KEY (`id_fornecedor`))
+CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_vendas` (
+  `id_venda` INT(11) NOT NULL AUTO_INCREMENT,
+  `data` DATE NOT NULL,
+  `valor` DECIMAL(9,2) NOT NULL,
+  PRIMARY KEY (`id_venda`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------
--- Table `estoque_adega`.`tb_item_nota_fiscal`
+-- Table `estoque_adega`.`tb_itens_venda`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_item_nota_fiscal` (
-  `id_nota_fiscal` INT(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_itens_venda` (
+  `id_itens_venda` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_venda` INT(11) NOT NULL,
   `id_produto` INT(11) NOT NULL,
   `quantidade` INT(11) NOT NULL,
-  `valor_unitario` DECIMAL(9,2) NOT NULL,
-  `valor_total` DECIMAL(9,2) NOT NULL,
-  PRIMARY KEY (`id_nota_fiscal`, `id_produto`),
-  INDEX `fk_produto_idx` (`id_produto` ASC))
+  PRIMARY KEY (`id_itens_venda`),
+  INDEX `fk_item_venda_idx` (`id_venda` ASC),
+  INDEX `fk_produto_item_idx` (`id_produto` ASC),
+  CONSTRAINT `fk_item_venda`
+    FOREIGN KEY (`id_venda`)
+    REFERENCES `estoque_adega`.`tb_vendas` (`id_venda`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_produto_item`
+    FOREIGN KEY (`id_produto`)
+    REFERENCES `estoque_adega`.`tb_produtos` (`id_produto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
@@ -184,35 +305,62 @@ CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_log_movimentacao_estoque` (
   `data_entrada` DATE NOT NULL,
   `data_saida` DATE NOT NULL,
   `tipo_movimentacao` ENUM('ENTRADA', 'SAIDA', 'FURTO', 'QUEBRA') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
-  PRIMARY KEY (`id_produto`))
+  PRIMARY KEY (`id_produto`),
+  CONSTRAINT `fk_produto_movimentado`
+    FOREIGN KEY (`id_produto`)
+    REFERENCES `estoque_adega`.`tb_produtos` (`id_produto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------
--- Table `estoque_adega`.`tb_marcas`
+-- Table `estoque_adega`.`tb_usuario`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_marcas` (
-  `id_marca` INT(11) NOT NULL AUTO_INCREMENT,
-  `marca` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `status` TINYINT(1) NOT NULL,
-  PRIMARY KEY (`id_marca`))
+CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_usuario` (
+  `id_usuario` INT(11) NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `email` VARCHAR(50) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `senha` VARCHAR(32) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `tipo_usuario` ENUM('ADMINISTRADOR', 'ATENDENTE') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `status` ENUM('ATIVO', 'INATIVO') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `data_cadastro` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_usuario`),
+  UNIQUE INDEX `idx_email` (`email` ASC))
 ENGINE = InnoDB
-AUTO_INCREMENT = 2
+AUTO_INCREMENT = 6
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------
--- Table `estoque_adega`.`tb_nota_fiscal`
+-- Table `estoque_adega`.`tb_pedidos`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_nota_fiscal` (
-  `id_nota_fiscal` INT(11) NOT NULL AUTO_INCREMENT,
-  `num_nota_fiscal` INT(11) NOT NULL,
-  `id_cliente` INT(11) NOT NULL,
-  PRIMARY KEY (`id_nota_fiscal`),
-  INDEX `fk_nota_cliente_idx` (`id_cliente` ASC))
+CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_pedidos` (
+  `id_pedido` INT(11) NOT NULL,
+  `id_fornecedor` INT(11) NOT NULL,
+  `id_usuario` INT(11) NOT NULL,
+  `data_emissao` DATE NOT NULL,
+  `valor_total` DOUBLE(9,2) NULL DEFAULT NULL,
+  `situacao` ENUM('FECHADO', 'ENTREGUE', 'EMITIDO', 'ABERTO', 'CANCELADO') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `prazo_pagamento` VARCHAR(20) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
+  `tp_pagamento` ENUM('PARCELADO 5X', 'PARCELADO 4X', 'PARCELADO 3X', 'PARCELADO 2X', 'A VISTA', 'BOLETO') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
+  `dt_cadastro` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_pedido`),
+  INDEX `fk_id_fornecedor` (`id_fornecedor` ASC),
+  INDEX `fk_id_usuario` (`id_usuario` ASC),
+  CONSTRAINT `fk_id_fornecedor`
+    FOREIGN KEY (`id_fornecedor`)
+    REFERENCES `estoque_adega`.`tb_fornecedores` (`id_fornecedor`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_id_usuario`
+    FOREIGN KEY (`id_usuario`)
+    REFERENCES `estoque_adega`.`tb_usuario` (`id_usuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
@@ -228,24 +376,17 @@ CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_pedido_item` (
   `valor_unitario` DECIMAL(9,2) NOT NULL,
   `valor_total` DECIMAL(9,2) NOT NULL,
   PRIMARY KEY (`id_pedido`, `id_produto`),
-  INDEX `fk_produto_idx` (`id_produto` ASC))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_unicode_ci;
-
-
--- -----------------------------------------------------
--- Table `estoque_adega`.`tb_pedidos`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_pedidos` (
-  `id_pedido` INT(11) NOT NULL AUTO_INCREMENT,
-  `id_fornecedor` INT(11) NOT NULL,
-  `id_usuario` INT(11) NOT NULL,
-  `data_emissao` DATE NOT NULL,
-  `situacao` ENUM('ATENDIDO', 'ABERTO', 'CANCELADO') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  PRIMARY KEY (`id_pedido`),
-  INDEX `fk_fornecedor_idx` (`id_fornecedor` ASC),
-  INDEX `fk_usuario_idx` (`id_usuario` ASC))
+  INDEX `fk_pedido_produto_item_idx` (`id_produto` ASC),
+  CONSTRAINT `fk_pedido_pedido_item`
+    FOREIGN KEY (`id_pedido`)
+    REFERENCES `estoque_adega`.`tb_pedidos` (`id_pedido`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_pedido_produto_item`
+    FOREIGN KEY (`id_produto`)
+    REFERENCES `estoque_adega`.`tb_produtos` (`id_produto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
@@ -255,51 +396,19 @@ COLLATE = utf8mb4_unicode_ci;
 -- Table `estoque_adega`.`tb_produto_validade`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_produto_validade` (
+  `id_prod_validade` INT(11) NOT NULL AUTO_INCREMENT,
   `id_produto` INT(11) NOT NULL,
-  `data_validade` DATE NULL DEFAULT NULL,
-  `lote` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
-  INDEX `fk_produto_idx` (`id_produto` ASC))
+  `data_validade` DATE NOT NULL,
+  `lote` VARCHAR(30) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `data_entrada` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_prod_validade`),
+  INDEX `idx_id_produto` (`id_produto` ASC, `data_validade` ASC, `lote` ASC),
+  CONSTRAINT `fk_id_produto`
+    FOREIGN KEY (`id_prod_validade`)
+    REFERENCES `estoque_adega`.`tb_produtos` (`id_produto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_unicode_ci;
-
-
--- -----------------------------------------------------
--- Table `estoque_adega`.`tb_produtos`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_produtos` (
-  `id_produto` INT(11) NOT NULL AUTO_INCREMENT,
-  `id_fornecedor` INT(11) NOT NULL,
-  `id_marca` INT(11) NOT NULL,
-  `id_categoria` INT(11) NOT NULL,
-  `descricao` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `cod_barras` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `data_cadastro` DATE NOT NULL,
-  `valor_custo` DECIMAL(9,2) NOT NULL,
-  `valor_venda` DECIMAL(9,2) NOT NULL,
-  PRIMARY KEY (`id_produto`),
-  INDEX `fk_fornecedores_idx` (`id_fornecedor` ASC),
-  INDEX `fk_marca_idx` (`id_marca` ASC),
-  INDEX `fk_categoria_idx` (`id_categoria` ASC))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_unicode_ci;
-
-
--- -----------------------------------------------------
--- Table `estoque_adega`.`tb_usuario`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `estoque_adega`.`tb_usuario` (
-  `id_usuario` INT(11) NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(45) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `email` VARCHAR(255) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `senha` VARCHAR(100) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `data_cadastro` DATE NOT NULL,
-  `status` TINYINT(1) NOT NULL,
-  `tipo` ENUM('ADMINISTRADOR', 'ATENDENTE') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
-  PRIMARY KEY (`id_usuario`))
-ENGINE = InnoDB
-AUTO_INCREMENT = 10
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 

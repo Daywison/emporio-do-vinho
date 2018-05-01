@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 28 Apr 2018 21:57:22 +0000.
+ * Date: Tue, 01 May 2018 00:55:11 +0000.
  */
 
 namespace App\Models;
@@ -15,6 +15,8 @@ use Reliese\Database\Eloquent\Model as Eloquent;
  * @property int $id_produto
  * @property int $quantidade
  * @property int $estoque_em_transito
+ * 
+ * @property \App\Models\TbProduto $tb_produto
  *
  * @package App\Models
  */
@@ -35,4 +37,9 @@ class TbEstoque extends Eloquent
 		'quantidade',
 		'estoque_em_transito'
 	];
+
+	public function tb_produto()
+	{
+		return $this->belongsTo(\App\Models\TbProduto::class, 'id_produto');
+	}
 }

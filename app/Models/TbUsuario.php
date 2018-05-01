@@ -31,7 +31,7 @@ class TbUsuario extends Eloquent
 	public $timestamps = false;
 
 	protected $casts = [
-		'status' => 'bool'
+		'status' => 'text'
 	];
 
 	protected $dates = [
@@ -52,15 +52,8 @@ class TbUsuario extends Eloquent
 		$email=Input::get('email');
 		$senha=md5(Input::get('senha'));
 		$data_cadastro=date("Y-m-d");
-
-		if (Input::get('status') == 'on'){
-			$situacao = 1;
-		}else{
-			$situacao = 0;
-		}
-
-		$status=$situacao;
-		$tipo=Input::get('tipo');
+		$status=Input::get('status');
+		$tipo_usuario=Input::get('tipo');
 
 		$usuario = new TbUsuario();
 
@@ -69,7 +62,7 @@ class TbUsuario extends Eloquent
 		$usuario->senha = $senha;
 		$usuario->data_cadastro = $data_cadastro;
 		$usuario->status = $status;
-		$usuario->tipo = $tipo;
+		$usuario->tipo_usuario = $tipo_usuario;
 
 		$usuario->save();
 

@@ -2,7 +2,7 @@
 
 /**
  * Created by Reliese Model.
- * Date: Sat, 28 Apr 2018 21:57:22 +0000.
+ * Date: Tue, 01 May 2018 00:55:11 +0000.
  */
 
 namespace App\Models;
@@ -13,14 +13,17 @@ use Reliese\Database\Eloquent\Model as Eloquent;
  * Class TbEnderecoFornecedor
  * 
  * @property int $id_endereco
- * @property string $rua
- * @property string $estado
- * @property string $cidade
- * @property string $bairro
- * @property string $numero
- * @property string $cep
- * @property string $logradouro
  * @property int $id_fornecedor
+ * @property string $rua
+ * @property int $numero
+ * @property string $complemento
+ * @property string $cep
+ * @property string $bairro
+ * @property string $cidade
+ * @property string $estado
+ * @property string $pais
+ * 
+ * @property \App\Models\TbFornecedore $tb_fornecedore
  *
  * @package App\Models
  */
@@ -31,17 +34,24 @@ class TbEnderecoFornecedor extends Eloquent
 	public $timestamps = false;
 
 	protected $casts = [
-		'id_fornecedor' => 'int'
+		'id_fornecedor' => 'int',
+		'numero' => 'int'
 	];
 
 	protected $fillable = [
+		'id_fornecedor',
 		'rua',
-		'estado',
-		'cidade',
-		'bairro',
 		'numero',
+		'complemento',
 		'cep',
-		'logradouro',
-		'id_fornecedor'
+		'bairro',
+		'cidade',
+		'estado',
+		'pais'
 	];
+
+	public function tb_fornecedore()
+	{
+		return $this->belongsTo(\App\Models\TbFornecedore::class, 'id_fornecedor');
+	}
 }

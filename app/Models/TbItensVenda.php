@@ -10,41 +10,40 @@ namespace App\Models;
 use Reliese\Database\Eloquent\Model as Eloquent;
 
 /**
- * Class TbLogMovimentacaoEstoque
+ * Class TbItensVenda
  * 
+ * @property int $id_itens_venda
+ * @property int $id_venda
  * @property int $id_produto
  * @property int $quantidade
- * @property \Carbon\Carbon $data_entrada
- * @property \Carbon\Carbon $data_saida
- * @property string $tipo_movimentacao
  * 
+ * @property \App\Models\TbVenda $tb_venda
  * @property \App\Models\TbProduto $tb_produto
  *
  * @package App\Models
  */
-class TbLogMovimentacaoEstoque extends Eloquent
+class TbItensVenda extends Eloquent
 {
-	protected $table = 'tb_log_movimentacao_estoque';
-	protected $primaryKey = 'id_produto';
-	public $incrementing = false;
+	protected $table = 'tb_itens_venda';
+	protected $primaryKey = 'id_itens_venda';
 	public $timestamps = false;
 
 	protected $casts = [
+		'id_venda' => 'int',
 		'id_produto' => 'int',
 		'quantidade' => 'int'
 	];
 
-	protected $dates = [
-		'data_entrada',
-		'data_saida'
+	protected $fillable = [
+		'id_venda',
+		'id_produto',
+		'quantidade'
 	];
 
-	protected $fillable = [
-		'quantidade',
-		'data_entrada',
-		'data_saida',
-		'tipo_movimentacao'
-	];
+	public function tb_venda()
+	{
+		return $this->belongsTo(\App\Models\TbVenda::class, 'id_venda');
+	}
 
 	public function tb_produto()
 	{

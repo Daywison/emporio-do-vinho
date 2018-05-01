@@ -99,12 +99,43 @@
   <div class="content-wrapper">
     <div class="container-fluid">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="#">Dashboard</a>
-        </li>
-        <li class="breadcrumb-item active">My Dashboard</li>
+        <h4>Listar usuários</h4>
       </ol>
+    </div>
+    <div class="col-md-12 div_buscar_usuario">
+    	<button class="btn btn-primary btn_adicionar_usuario"><a href="/form_usuario">Adicionar usuário</a></button>
+	    <form action="" class="form-pesquisar">
+	      <input type="text" placeholder="Buscar" name="buscar" class="inp_buscar_usuario">
+	      <button type="submit"  class="btn_buscar_usuario"><i class="fa fa-search"></i></button>
+	    </form>	
     </div> 
-  </div>
+    <div class="col-md-12">
+    	<table class="table table-striped table-bordered table-hover">
+    		<thead>
+    		<tr>
+    			<td>ID</td>
+    			<td>Nome</td>
+    			<td>Email</td>
+    			<td>Perfil</td>    			
+    			<td>Status</td>
+    			<td>Ações</td>
+    		</tr>
+    		<thead>
+    		<tbody>
+    			@foreach ( $usuarios as $usuario )
+    			<tr>
+    				<td>{{ $usuario->id_usuario }}</td>
+    				<td>{{ $usuario->nome }}</td>
+    				<td>{{ $usuario->email }}</td>
+    				<td>{{ $usuario->tipo_usuario }}</td>
+    				<td>{{ $usuario->status }}</td>
+    				<td><a href="{{ url('/usuario_editar', $usuario->id_usuario) }}"><i style="color:gray" class="fa fa-edit fa-lg"></i></a>&nbsp;<a href="{{ url('/usuario_excluir', $usuario->id_usuario) }}"><i style="color:#DC143C"  class="fa fa-trash fa-lg"></i></a></td>
+    			</tr>
+    			@endforeach		        
+    		</tbody>
+    	</table>
+    </div> 
+  </div> 
+</div>
 @endsection
 @extends('dashboard.rodape')

@@ -19,9 +19,12 @@ Route::get('/dashboard', function(){
 	return view('dashboard.dashboard');
 });
 
-Route::get('/registrar', function(){
-	return view('registrar.registrar');
-});
 
-Route::post('/registrar_action','UsuarioController@cadastrar');
+Route::get('/form_usuario', 'UsuarioController@formulario_cadastro');
+Route::get('/gerenciar_usuario', 'UsuarioController@listar');
+Route::get('/usuario_editar/{id_usuario}', 'UsuarioController@editar');
+Route::get('/usuario_excluir/{id_usuario}','UsuarioController@excluir');
+
+Route::post('/usuario_cadastrar','UsuarioController@cadastrar');
+Route::post('usuario_atualizar/{id_usuario}', 'UsuarioController@atualizar');
 Route::post('/login','LoginController@login');
